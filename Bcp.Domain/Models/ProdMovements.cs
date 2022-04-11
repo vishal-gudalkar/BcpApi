@@ -16,10 +16,10 @@ namespace Bcp.Domain.Models
         public string OrderNb { get; set; }
         public string WorkCenterPlan { get; set; }
         public string MatNr { get; set; }
-        public string Master_Camp { get; set; }
-        public int? Qty_To_Prod { get; set; }
-        public string Work_Center { get; set; }
-        public int? Net_Qty { get; set; }
+        public string MasterCamp { get; set; }
+        public int? QtyToProd { get; set; }
+        public string WorkCenter { get; set; }
+        public int? NetQty { get; set; }
         public int? Scrap { get; set; }
         public string TmStmp { get; set; }
         public string User { get; set; }

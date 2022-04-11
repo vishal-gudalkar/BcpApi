@@ -15,8 +15,6 @@ namespace Bcp.Domain.Models
         public int Id { get; set; }
         public string Material { get; set; }
         public DateTime? Created { get; set; }
-
-        [Column(name: "old mat.no")]
         public string OldMatNo { get; set; }
         public string MaterialNumber { get; set; }
         public string CarSegment { get; set; }
@@ -99,7 +97,6 @@ namespace Bcp.Domain.Models
         [Column(TypeName = "varchar(5)")]
         public string BUn1 { get; set; }
 
-        [Column(name: "Min.LotSze")]
         public string MinLotSze { get; set; }
 
         [Column(TypeName = "varchar(5)")]
@@ -109,19 +106,17 @@ namespace Bcp.Domain.Models
         [Column(TypeName = "varchar(5)")]
         public string BUn3 { get; set; }
 
-        [Column(name: "Max.LotSize")]
         public string MaxLotSize { get; set; }
 
         [Column(TypeName = "varchar(5)")]
         public string BUn4 { get; set; }
-
-        [Column(name: "Fix.lotsize")]
+        
         public string FixLotSize { get; set; }
 
         [Column(TypeName = "varchar(5)")]
         public string BUn5 { get; set; }
 
-        [Column(name: "Roundingval.")]
+        [Column(name: "RoundingVal")]
         public string Roundingval { get; set; }
 
         [Column(TypeName = "varchar(5)")]
@@ -155,7 +150,7 @@ namespace Bcp.Domain.Models
         [Column(TypeName = "varchar(5)")]
         public string BUn7 { get; set; }
 
-        [Column(name: "Profl.", TypeName = "varchar(5)")]
+        [Column(TypeName = "varchar(5)")]
         public string Profl { get; set; }
 
         [Column(TypeName = "varchar(5)")]
