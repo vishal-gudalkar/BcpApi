@@ -5,9 +5,9 @@ VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bcp.Api", "BcpApi\Bcp.Api.csproj", "{11FE9ED6-372C-4B77-929F-88690C2A3375}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bcp.Domain", "Bcp.Domain\Bcp.Domain.csproj", "{09E2F3AD-432F-402D-BA0E-FD3EE90FB623}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bcp.Domain", "Bcp.Domain\Bcp.Domain.csproj", "{09E2F3AD-432F-402D-BA0E-FD3EE90FB623}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bcp.Data", "Bcp.Data\Bcp.Data.csproj", "{71DC8893-DFC1-4A1B-9396-A8DD5E5E00C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bcp.Data", "Bcp.Data\Bcp.Data.csproj", "{71DC8893-DFC1-4A1B-9396-A8DD5E5E00C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

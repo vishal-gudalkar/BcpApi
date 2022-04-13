@@ -25,10 +25,13 @@ namespace BcpApi
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
-        {
+        {            
             services.AddMvc();
+            services.AddCors();
+            services.AddSwaggerGen();
             services.AddDbContext<BcpContext>(x =>
                               x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,16 +41,21 @@ namespace BcpApi
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors(builder => builder.WithOrigins(Configuration["WebApplicationUrl"])
+                                                 .AllowAnyOrigin()
+                                                 .AllowAnyMethod()
+                                                 .AllowAnyHeader());
             app.UseRouting();
-
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.RoutePrefix = "";
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            });
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
-            });
+                endpoints.MapControllers();
+            });            
         }
     }
 }
