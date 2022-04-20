@@ -52,7 +52,6 @@ namespace Bcp.Api.Controllers
         public void Delete(int id)
         {
         }
-        [Authorize]
         [HttpGet("GetLabelValue")]
         public IActionResult GetLabelValue()
         {
