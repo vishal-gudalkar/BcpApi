@@ -39,6 +39,7 @@ namespace BcpApi
 
             services.AddCors();
             services.AddSwaggerGen();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddDbContext<BcpContext>(x =>
                               x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -70,6 +71,7 @@ namespace BcpApi
                                                  .AllowAnyOrigin()
                                                  .AllowAnyMethod()
                                                  .AllowAnyHeader());
+
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

@@ -29,5 +29,7 @@ namespace Bcp.Data
         public DbSet<Users> users { get; set; }
         public DbSet<Zp36ProdOrders> zp36prodorders { get; set; }
         public DbSet<ZtpMatDiagram> ztpmatdiagrams { get; set; }
+        public DbSet<RackTypes> racktypes { get; set; }
+        public DbSet<StorageLocation> storagelocation { get; set; }
     }
 }
