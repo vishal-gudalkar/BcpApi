@@ -1,5 +1,6 @@
 ﻿using Bcp.Data;
 using Bcp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,7 @@ namespace Bcp.Api.Controllers
         {
         }
 
+        [Authorize]
         [HttpGet("GetLabelValue")]
         public IActionResult GetLabelValue()
         {

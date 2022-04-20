@@ -6,7 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Okta.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,13 +27,36 @@ namespace BcpApi
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
-        {            
-            services.AddMvc();
+        {
+            services.AddAuthorization();
+
+            services.AddMvc(o => { 
+                var policy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+                o.Filters.Add(new AuthorizeFilter(policy));
+            });
+
             services.AddCors();
             services.AddSwaggerGen();
             services.AddDbContext<BcpContext>(x =>
                               x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-           
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = OktaDefaults.ApiAuthenticationScheme;
+                options.DefaultChallengeScheme = OktaDefaults.ApiAuthenticationScheme;
+                options.DefaultSignInScheme = OktaDefaults.ApiAuthenticationScheme;
+            })
+            .AddOktaWebApi(new OktaWebApiOptions()
+            {
+                OktaDomain = Configuration["Okta:OktaDomain"],
+                AuthorizationServerId = Configuration["Okta:AuthorizationServerId"],
+                Audience = Configuration["Okta:Audience"]
+            });
+
+            
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +71,8 @@ namespace BcpApi
                                                  .AllowAnyMethod()
                                                  .AllowAnyHeader());
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -55,7 +82,7 @@ namespace BcpApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });            
+            });             
         }
     }
 }
