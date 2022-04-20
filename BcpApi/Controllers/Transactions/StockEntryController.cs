@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-
+using AutoMapper;
+using Bcp.Domain.Dtos;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Bcp.Api.Controllers
@@ -14,9 +15,11 @@ namespace Bcp.Api.Controllers
     public class StockEntryController : ControllerBase
     {
         private readonly BcpContext _context;
-        public StockEntryController(BcpContext context)
+        private readonly IMapper _mapper;
+        public StockEntryController(BcpContext context, IMapper mapper)
         { 
             _context = context;
+            _mapper = mapper;
         }
         // GET: api/<StockEntryController>
         [HttpGet]
@@ -49,7 +52,6 @@ namespace Bcp.Api.Controllers
         public void Delete(int id)
         {
         }
-
         [Authorize]
         [HttpGet("GetLabelValue")]
         public IActionResult GetLabelValue()
@@ -70,6 +72,34 @@ namespace Bcp.Api.Controllers
             }
 
         }
-        
+
+        [HttpGet("RackTypes")]
+        public IActionResult GetRackTypes()
+        {
+            var data = _context.racktypes.AsQueryable();
+            return Ok(data);
+        }
+
+        [HttpGet("StorageLocations")]
+        public IActionResult GetStorageLocations()
+        {
+            var data = _context.storagelocation.AsQueryable();
+            return Ok(data);
+        }
+        [HttpPost("SaveStockEntry")]
+        public IActionResult SaveStockEntry(StockWmsDto stockEntry)
+        {
+            
+            if (stockEntry != null)
+            {
+                var stockWmsDto = _mapper.Map<StockWms>(stockEntry);
+                _context.stockwms.Add(stockWmsDto);
+                _context.SaveChanges();
+                var stockMovementsDto = _mapper.Map<StockMovements>(stockEntry);
+                _context.stockmovements.Add(stockMovementsDto);
+                _context.SaveChanges();
+            }
+            return Ok();
+        }
     }
 }
