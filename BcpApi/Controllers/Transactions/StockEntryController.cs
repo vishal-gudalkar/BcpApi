@@ -94,7 +94,6 @@ namespace Bcp.Api.Controllers
             {
                 var stockWmsDto = _mapper.Map<StockWms>(stockEntry);
                 _context.stockwms.Add(stockWmsDto);
-                _context.SaveChanges();
                 var stockMovementsDto = _mapper.Map<StockMovements>(stockEntry);
                 _context.stockmovements.Add(stockMovementsDto);
                 _context.SaveChanges();
