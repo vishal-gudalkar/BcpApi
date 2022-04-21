@@ -1,6 +1,8 @@
 ﻿using Bcp.Data;
 using Bcp.Domain.Dtos;
+using Bcp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Linq;
 namespace Bcp.Api.Controllers
 {
@@ -16,37 +18,7 @@ namespace Bcp.Api.Controllers
         [HttpPost("GetStockWmsReportDetails")]
         public IActionResult GetStockWmsReportDetails([FromBody]  StockWmsSearchDto searchStockWms)
         {
-            var data = (from stwms in _context.stockwms
-                              join cls in _context.classifications on stwms.Product equals cls.Material
-                              into clsTemp
-                              from stCls in clsTemp.DefaultIfEmpty()
-                              join slm in _context.saplocmarket on stwms.SapLoc equals slm.SapLoc
-                              into slmTemp
-                              from stSlm in slmTemp.DefaultIfEmpty()
-                              select new
-                              {
-                                  stwms.DryDate,
-                                  stwms.MatType,
-                                  stwms.Bin,
-                                  stwms.ContentStatus,
-                                  stwms.LabelNr,
-                                  StockMarket = stwms.Market,
-                                  stwms.Product,
-                                  stwms.PrNetWeight,
-                                  stwms.PrWeightUnit,
-                                  stwms.Qty,
-                                  stwms.RackType,
-                                  stwms.RackId,
-                                  stwms.SapLoc,
-                                  stwms.Plant,
-                                  stwms.Delivery,
-                                  stwms.ProdAdd,
-                                  stwms.ProdDsc2,
-                                  stwms.SerialNr,
-                                  stwms.BatchNr,
-                                  stCls.MaterialNumber,
-                                  Market = stSlm.Market
-                              }).AsQueryable();
+            var data = GetExportData();
             if (!string.IsNullOrEmpty(searchStockWms.Bin))
             {
                 data = data.Where(x => x.Bin == searchStockWms.Bin);
@@ -93,6 +65,47 @@ namespace Bcp.Api.Controllers
             }
             var result = data.ToList();
             return Ok(result);
+        }
+        [HttpGet("StockWmsExcelExportData")]
+        public IActionResult GetStockWmsExcelExportData()
+        {
+            var data = GetExportData();
+            var result = data.ToList();
+            return Ok(result);
+        }
+       private IQueryable<StockWms> GetExportData()
+        {
+            var data = (from stwms in _context.stockwms
+                        join cls in _context.classifications on stwms.Product equals cls.Material
+                        into clsTemp
+                        from stCls in clsTemp.DefaultIfEmpty()
+                        join slm in _context.saplocmarket on stwms.SapLoc equals slm.SapLoc
+                        into slmTemp
+                        from stSlm in slmTemp.DefaultIfEmpty()
+                        select new StockWms
+                        {
+                           DryDate= stwms.DryDate,
+                            MatType= stwms.MatType,
+                            Bin= stwms.Bin,
+                            ContentStatus=stwms.ContentStatus,
+                            LabelNr=stwms.LabelNr,
+                            Product=stwms.Product,
+                            PrNetWeight= stwms.PrNetWeight,
+                            PrWeightUnit=stwms.PrWeightUnit,
+                            Qty=stwms.Qty,
+                            RackType=stwms.RackType,
+                            RackId=stwms.RackId,
+                            SapLoc=stwms.SapLoc,
+                            Plant=stwms.Plant,
+                            Delivery=stwms.Delivery,
+                            ProdAdd=stwms.ProdAdd,
+                            ProdDsc2=stwms.ProdDsc2,
+                            SerialNr=stwms.SerialNr,
+                            BatchNr=stwms.BatchNr,
+                            MatGrp = stCls.MaterialNumber,
+                            Market = stSlm.Market
+                        }).AsQueryable();
+            return data;
         }
     }
 }
