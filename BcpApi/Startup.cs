@@ -13,6 +13,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Bcp.Api.Services;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace BcpApi
 {
@@ -58,6 +62,9 @@ namespace BcpApi
 
             
             services.AddControllers();
+            //services.AddSingleton(x => new BlobServiceClient(Configuration.GetValue<string>("AzureBlobStorageConnectionString")));
+            services.AddSingleton(x => new BlobContainerClient(Configuration.GetValue<string>("AzureBlobStorageConnectionString"), Configuration.GetValue<string>("AzureContainerName")));
+            services.AddScoped<IBlobService, BlobService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,7 +91,13 @@ namespace BcpApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });             
+            });
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"DownloadedFiles")),
+                RequestPath = new PathString("/DownloadedFiles")
+            });
         }
     }
 }

@@ -18,17 +18,23 @@ namespace Bcp.Domain.Models
         [DefaultValue("-")]
         public string User { get; set; }
         [Column(TypeName = "varchar(5)")]
+        [Required]
         public string Plant { get; set; }
         public string SapLoc { get; set; }
         public string LabelNr { get; set; }
         public string SerialNr { get; set; }
         public string BatchNr { get; set; }
+        [Required]
         public string RackId { get; set; }
+        [Required]
         public string RackType { get; set; }
         public string Bin { get; set; }
         public string Product { get; set; }
+        [Required]
         public int? Qty { get; set; }
+        [Required]
         public string ContentStatus { get; set; }
+        [Required]
         public string Delivery { get; set; }  
     }
 }
