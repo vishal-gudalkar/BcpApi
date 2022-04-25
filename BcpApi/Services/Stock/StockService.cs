@@ -101,5 +101,39 @@ namespace Bcp.Api.Services.Stock
                 return null;
             }
         }
+
+        public async Task SaveStockRemoval(StockWmsDto stockRemoval) 
+        {
+            try 
+            {
+                if (stockRemoval != null)
+                {
+                    StockWms data = (from stWms in _context.stockwms
+                                     where (stWms.LabelNr == stockRemoval.LabelNr && stWms.Product == stockRemoval.Product && stWms.Plant == stockRemoval.Plant && stWms.SapLoc == stockRemoval.SapLoc)
+                                     select stWms).FirstOrDefault();
+                    if (data != null)
+                    {
+                        data.Qty = stockRemoval.Qty;
+                        data.Delivery = stockRemoval.Delivery;
+                        _context.stockwms.Update(data);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        var stockWmsDto = _mapper.Map<StockWms>(stockRemoval);
+                        _context.stockwms.Add(stockWmsDto);
+                        await _context.SaveChangesAsync();
+                    }
+                    var stockMovementsDto = _mapper.Map<StockMovements>(stockRemoval);
+                    _context.stockmovements.Add(stockMovementsDto);
+                    await _context.SaveChangesAsync();
+                }
+                
+            }
+            catch (Exception ex) 
+            {
+                
+            }
+        }
     }
 }

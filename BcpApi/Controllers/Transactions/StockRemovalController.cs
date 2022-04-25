@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using AutoMapper;
 using Bcp.Domain.Dtos;
 using System.Linq;
+using Bcp.Api.Services.Stock;
+using System.Threading.Tasks;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Bcp.Api.Controllers
@@ -15,39 +17,18 @@ namespace Bcp.Api.Controllers
     [ApiController]
     public class StockRemovalController : ControllerBase
     {
-        private readonly BcpContext _context;
-        private readonly IMapper _mapper;
-        public StockRemovalController(BcpContext context, IMapper mapper)
-        { 
-            _context = context;
-            _mapper = mapper;
+        private readonly IStockService _stockService;
+        public StockRemovalController(IStockService stockService)
+        {
+            _stockService = stockService;
         }
 
         [HttpPost("SaveUpdateStockRemoval")]
-        public IActionResult SaveUpdateStockRemoval(StockWmsDto stockRemoval)
+        public async Task<IActionResult> SaveUpdateStockRemoval(StockWmsDto stockRemoval)
         {
-
-            if (stockRemoval != null)
+            if (ModelState.IsValid)
             {
-                StockWms data = (from stWms in _context.stockwms
-                                 where (stWms.LabelNr == stockRemoval.LabelNr && stWms.Product == stockRemoval.Product && stWms.Plant == stockRemoval.Plant && stWms.SapLoc == stockRemoval.SapLoc)
-                                 select stWms).FirstOrDefault();
-                if (data != null)
-                {
-                    data.Qty = stockRemoval.Qty;
-                    data.Delivery = stockRemoval.Delivery;
-                    _context.stockwms.Update(data);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    var stockWmsDto = _mapper.Map<StockWms>(stockRemoval);
-                    _context.stockwms.Add(stockWmsDto);
-                    _context.SaveChanges();
-                }
-                var stockMovementsDto = _mapper.Map<StockMovements>(stockRemoval);
-                _context.stockmovements.Add(stockMovementsDto);
-                _context.SaveChanges();
+                await _stockService.SaveStockRemoval(stockRemoval);
             }
             return Ok();
         }

@@ -11,6 +11,7 @@ namespace Bcp.Api.Services.Stock
         IQueryable<RackTypes> GetRackTypes();
         IQueryable<StorageLocation> GetStorageLocations();
         Task SaveStock(StockWmsDto stockEntry);
+        Task SaveStockRemoval(StockWmsDto stockRemoval);
         IQueryable<StockWms> GetExportData();
 
     }
