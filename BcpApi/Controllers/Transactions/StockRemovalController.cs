@@ -29,22 +29,14 @@ namespace Bcp.Api.Controllers
 
             if (stockRemoval != null)
             {
-                StockWmsDto data = (from stWms in _context.stockwms
-                            where (stWms.LabelNr == stockRemoval.LabelNr && stWms.Product == stockRemoval.Product && stWms.Plant == stockRemoval.Plant && stWms.SapLoc == stockRemoval.SapLoc)
-                            select new StockWmsDto
-                            {
-                                Id=stWms.Id,
-                                Product=stWms.Product,
-                                SapLoc=stWms.SapLoc,
-                                LabelNr=stWms.LabelNr,
-                                Plant=stWms.Plant
-                            }).FirstOrDefault();
+                StockWms data = (from stWms in _context.stockwms
+                                 where (stWms.LabelNr == stockRemoval.LabelNr && stWms.Product == stockRemoval.Product && stWms.Plant == stockRemoval.Plant && stWms.SapLoc == stockRemoval.SapLoc)
+                                 select stWms).FirstOrDefault();
                 if (data != null)
                 {
                     data.Qty = stockRemoval.Qty;
                     data.Delivery = stockRemoval.Delivery;
-                    var stockWmsDto = _mapper.Map<StockWms>(data);
-                    _context.stockwms.Update(stockWmsDto);
+                    _context.stockwms.Update(data);
                     _context.SaveChanges();
                 }
                 else
@@ -52,11 +44,10 @@ namespace Bcp.Api.Controllers
                     var stockWmsDto = _mapper.Map<StockWms>(stockRemoval);
                     _context.stockwms.Add(stockWmsDto);
                     _context.SaveChanges();
-
-                    var stockMovementsDto = _mapper.Map<StockMovements>(stockRemoval);
-                    _context.stockmovements.Add(stockMovementsDto);
-                    _context.SaveChanges();
-                }           
+                }
+                var stockMovementsDto = _mapper.Map<StockMovements>(stockRemoval);
+                _context.stockmovements.Add(stockMovementsDto);
+                _context.SaveChanges();
             }
             return Ok();
         }
