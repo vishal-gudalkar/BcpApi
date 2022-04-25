@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using AutoMapper;
 using Bcp.Domain.Dtos;
+using Bcp.Api.Services.Stock;
+using System.Threading.Tasks;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Bcp.Api.Controllers
@@ -14,12 +16,10 @@ namespace Bcp.Api.Controllers
     [ApiController]
     public class StockEntryController : ControllerBase
     {
-        private readonly BcpContext _context;
-        private readonly IMapper _mapper;
-        public StockEntryController(BcpContext context, IMapper mapper)
+        private readonly IStockService _stockService;
+        public StockEntryController(IStockService stockService)
         { 
-            _context = context;
-            _mapper = mapper;
+            _stockService = stockService;
         }
         
         [HttpGet("GetLabelValue")]
@@ -27,12 +27,7 @@ namespace Bcp.Api.Controllers
         {
             try
             {
-                Lblnbgen lbl = new Lblnbgen();
-                _context.lblnbgens.Add(lbl);
-                _context.SaveChanges();              
-                var res = lbl.LblId;
-                _context.lblnbgens.Remove(lbl);
-                _context.SaveChanges();
+                var res = _stockService.GetLabel();
                 return Ok(res);
             }
             catch (Exception ex)
@@ -45,28 +40,37 @@ namespace Bcp.Api.Controllers
         [HttpGet("RackTypes")]
         public IActionResult GetRackTypes()
         {
-            var data = _context.racktypes.AsQueryable();
-            return Ok(data);
+            try
+            {
+                var data = _stockService.GetRackTypes();
+                return Ok(data);
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("StorageLocations")]
         public IActionResult GetStorageLocations()
         {
-            var data = _context.storagelocation.AsQueryable();
-            return Ok(data);
-        }
-        [HttpPost("SaveStockEntry")]
-        public IActionResult SaveStockEntry(StockWmsDto stockEntry)
-        {
-            
-            if (stockEntry != null)
+            try
             {
-                var stockWmsDto = _mapper.Map<StockWms>(stockEntry);
-                _context.stockwms.Add(stockWmsDto);
-                _context.SaveChanges();
-                var stockMovementsDto = _mapper.Map<StockMovements>(stockEntry);
-                _context.stockmovements.Add(stockMovementsDto);
-                _context.SaveChanges();
+                var data = _stockService.GetStorageLocations();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("SaveStockEntry")]
+        public async Task<IActionResult> SaveStockEntry(StockWmsDto stockEntry)
+        {            
+            if (ModelState.IsValid)
+            {
+                await _stockService.SaveStock(stockEntry);
             }
             return Ok();
         }
