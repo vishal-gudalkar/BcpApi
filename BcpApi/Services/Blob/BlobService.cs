@@ -181,13 +181,13 @@ namespace Bcp.Api.Services
                             Delivery = values[17]
                         });
                     }
-                    else if (values.Count() == 39)
+                    /*else if (values.Count() == 39)
                     {
-                        if (values[0] != "\"FACILITY\"")
+                        if (values[0].Replace("\"", "").Replace("\"", "") != "FACILITY")
                         {
                             stocks.Add(new StockWms()
                             {
-                                Bin = values[6],
+                                Bin = values[6].Replace("\"", "").Replace("\"", ""),
                                 BinStatus = values[30],
                                 CarBrand = values[33],
                                 ContentStatus = values[7],
@@ -264,21 +264,17 @@ namespace Bcp.Api.Services
                                 Qty = !string.IsNullOrEmpty(values[14]) ? Int32.Parse(values[14]) : 0
                             });
                         }
-                    }
+                    }*/
                 }
             }
 
             if (_context.stockwms.Count() > 0)
             {
                 //Clearing the data before do bulkInsert
-                //await _context.TruncateAsync<StockWms>();
+                await _context.TruncateAsync<StockWms>();
             }
             //Bulk Insert
-            //await _context.BulkInsertAsync(stocks);
-            //string context = new StreamReader(blobStream).ReadToEnd();
-
-            //string filePath = Path.Combine("DownloadedFiles");
-            //blobClient.DownloadTo(@"" + filePath + "");            
+            await _context.BulkInsertAsync(stocks);                        
         }
 
     }

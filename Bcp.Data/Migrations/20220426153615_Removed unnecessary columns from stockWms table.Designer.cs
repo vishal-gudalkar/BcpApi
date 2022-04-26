@@ -4,6 +4,7 @@ using Bcp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bcp.Data.Migrations
 {
     [DbContext(typeof(BcpContext))]
-    partial class BcpContextModelSnapshot : ModelSnapshot
+    [Migration("20220426153615_Removed unnecessary columns from stockWms table")]
+    partial class RemovedunnecessarycolumnsfromstockWmstable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

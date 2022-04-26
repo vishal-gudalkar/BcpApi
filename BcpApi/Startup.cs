@@ -64,7 +64,6 @@ namespace BcpApi
 
             
             services.AddControllers();
-            //services.AddSingleton(x => new BlobServiceClient(Configuration.GetValue<string>("AzureBlobStorageConnectionString")));
             services.AddSingleton(x => new BlobContainerClient(Configuration.GetValue<string>("AzureBlobStorageConnectionString"), Configuration.GetValue<string>("AzureContainerName")));
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IStockService, StockService>();
