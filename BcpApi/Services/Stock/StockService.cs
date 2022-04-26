@@ -92,8 +92,8 @@ namespace Bcp.Api.Services.Stock
                                 ProdDsc2 = stwms.ProdDsc2,
                                 SerialNr = stwms.SerialNr,
                                 BatchNr = stwms.BatchNr,
-                                MatGrp = stCls.MaterialNumber,
-                                Market = stSlm.Market
+                                MatGrp = stCls == null ? string.Empty : stCls.MaterialNumber,
+                                Market = stSlm == null ? string.Empty : stSlm.Market
                             }).AsQueryable();
                 return data;
             }
