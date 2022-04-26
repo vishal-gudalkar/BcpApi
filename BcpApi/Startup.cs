@@ -18,6 +18,7 @@ using Bcp.Api.Services;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using Bcp.Api.Services.Stock;
+using Bcp.Api.Services.Common;
 
 namespace BcpApi
 {
@@ -67,6 +68,7 @@ namespace BcpApi
             services.AddSingleton(x => new BlobContainerClient(Configuration.GetValue<string>("AzureBlobStorageConnectionString"), Configuration.GetValue<string>("AzureContainerName")));
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IStockService, StockService>();
+            services.AddScoped<ICommonService, CommonService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
