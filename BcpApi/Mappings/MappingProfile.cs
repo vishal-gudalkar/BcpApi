@@ -9,7 +9,7 @@ namespace Bcp.Api.Mappings
        public MappingProfile()
        {
            CreateMap<StockWmsDto, StockWms>();
-            CreateMap<StockWmsDto, StockMovements>();
+           CreateMap<StockWmsDto, StockMovements>();
         }
    }
 }

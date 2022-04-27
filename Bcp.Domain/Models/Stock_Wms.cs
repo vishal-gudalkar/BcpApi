@@ -13,7 +13,6 @@ namespace Bcp.Domain.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
         public string Bin { get; set; }
         [Column(TypeName = "varchar(2)")]
         public string ContentStatus { get; set; }

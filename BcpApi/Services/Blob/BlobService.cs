@@ -1,9 +1,13 @@
 ﻿using Azure.Storage.Blobs;
+using Bcp.Api.CsvHelperMappings;
 using Bcp.Data;
 using Bcp.Domain.Models;
+using CsvHelper;
+using CsvHelper.Configuration;
 using EFCore.BulkExtensions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,42 +24,6 @@ namespace Bcp.Api.Services
             _blobContainerClient = blobContainerClient;
             _context = bcpContext;
         }
-        async Task GetRoutingBlobAsync(string name)
-        {
-            var blobClient = _blobContainerClient.GetBlobClient(name);
-            MemoryStream blobStream = new MemoryStream();
-            await blobClient.DownloadToAsync(blobStream);
-            blobStream.Position = 0;
-            
-            var routings = new List<Routing>();
-            
-            using (var reader = new StreamReader(blobStream)) 
-            {
-                while (!reader.EndOfStream)
-                { 
-                    var line = reader.ReadLine();
-                    var values = line.Split(';');
-                    routings.Add(new Routing()
-                    {
-                        Plant = values[0],
-                        ConsolidatedCode = values[1].Replace(values[1].Substring(0, 11), ""),
-                        Material = values[2].Replace(values[2].Substring(0, 11), ""),
-                        MaterialType = values[3],
-                        Operation = values[4],
-                        WorkCenter = values[5],
-                        Description = values[6],
-                        Stufe = Int16.Parse(values[7])
-                    });
-                }
-            }
-            //Bulk Insert
-            await _context.BulkInsertAsync(routings);
-            //string context = new StreamReader(blobStream).ReadToEnd();
-
-            //string filePath = Path.Combine("DownloadedFiles");
-            //blobClient.DownloadTo(@"" + filePath + "");            
-        }
-
         public async Task ListBlobAsync()
         {
             await foreach (var blobItem in _blobContainerClient.GetBlobsAsync())
@@ -68,16 +36,49 @@ namespace Bcp.Api.Services
                 //{
                 //    await GetClassificationBlobAsync(blobItem.Name);
                 //}
-                else if (blobItem.Name.ToLower().Contains("customers"))
-                {
-                    //await GetCustomersBlobAsync(blobItem.Name);
-                }
+                //else if (blobItem.Name.ToLower().Contains("customers"))
+                //{
+                //await GetCustomersBlobAsync(blobItem.Name);
+                //}
                 else if (blobItem.Name.ToLower().Contains("stock"))
                 {
                     await GetStockBlobAsync(blobItem.Name);
-                }
-                //items.Add(blobItem.Name);
+                }                
             }            
+        }
+        async Task GetRoutingBlobAsync(string name)
+        {
+            var blobClient = _blobContainerClient.GetBlobClient(name);
+            MemoryStream blobStream = new MemoryStream();
+            await blobClient.DownloadToAsync(blobStream);
+            blobStream.Position = 0;
+
+            var routings = new List<Routing>();
+
+            using (var reader = new StreamReader(blobStream))
+            {
+                var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    Delimiter = ";",
+                    HasHeaderRecord = false,
+                    MissingFieldFound = null,
+                    IgnoreBlankLines = true
+                };
+
+                using (var csvReader = new CsvReader(reader, csvConfig)) 
+                {
+                    csvReader.Context.RegisterClassMap<RoutingClassMap>();
+                    routings = csvReader.GetRecords<Routing>().ToList();
+                }                
+            }
+
+            if (_context.routing.Count() > 0)
+            {
+                //Clearing the data before the bulkInsert
+                await _context.TruncateAsync<Routing>();
+            }
+            //Bulk Insert
+            await _context.BulkInsertAsync(routings);          
         }
 
         async Task GetCustomersBlobAsync(string name)
@@ -161,7 +162,43 @@ namespace Bcp.Api.Services
 
             using (var reader = new StreamReader(blobStream))
             {
-                while (!reader.EndOfStream)
+                var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture);
+                bool isStock = false;
+
+                if (name.ToLower().Contains("_stock"))
+                {
+
+                    csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        Delimiter = ",",
+                        HasHeaderRecord = true,
+                        MissingFieldFound = null,
+                        IgnoreBlankLines = true
+                    };
+                }
+                else
+                {
+                    isStock = true;
+                    csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        Delimiter = ";",
+                        HasHeaderRecord = false,
+                        MissingFieldFound = null,
+                        IgnoreBlankLines = true,
+                    };
+                }            
+
+                using (var csvReader = new CsvReader(reader, csvConfig))
+                {
+                    if (isStock)
+                    {
+                        csvReader.Context.RegisterClassMap<StocksClassMap>();
+                        stocks = csvReader.GetRecords<StockWms>().ToList();
+                    }
+                }
+
+
+                /*while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
                     var values = line.Contains(";") ? line.Split(';') : line.Split(',');
@@ -181,7 +218,7 @@ namespace Bcp.Api.Services
                             Delivery = values[17]
                         });
                     }
-                    /*else if (values.Count() == 39)
+                    else if (values.Count() == 39)
                     {
                         if (values[0].Replace("\"", "").Replace("\"", "") != "FACILITY")
                         {
@@ -264,17 +301,17 @@ namespace Bcp.Api.Services
                                 Qty = !string.IsNullOrEmpty(values[14]) ? Int32.Parse(values[14]) : 0
                             });
                         }
-                    }*/
-                }
+                    }
+                }*/
             }
 
             if (_context.stockwms.Count() > 0)
             {
                 //Clearing the data before do bulkInsert
-                await _context.TruncateAsync<StockWms>();
+                //await _context.TruncateAsync<StockWms>();
             }
             //Bulk Insert
-            await _context.BulkInsertAsync(stocks);                        
+            //await _context.BulkInsertAsync(stocks);                        
         }
 
     }
