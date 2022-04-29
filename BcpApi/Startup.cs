@@ -68,6 +68,7 @@ namespace BcpApi
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IStockService, StockService>();
             services.AddScoped<ICommonService, CommonService>();
+            services.AddScoped<IStockChangesService, StockChangesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
